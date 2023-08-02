@@ -15,15 +15,19 @@ const widgetMappings = {
   openmeteo: dynamic(() => import("components/widgets/openmeteo/openmeteo")),
   longhorn: dynamic(() => import("components/widgets/longhorn/longhorn")),
   kubernetes: dynamic(() => import("components/widgets/kubernetes/kubernetes")),
+  player: dynamic(() => import("components/widgets/player/player")),
+  quote: dynamic(() => import("components/widgets/quote/quote")),
+  myopenweather: dynamic(() => import("components/widgets/myopenweather/weather")),
+  calendar: dynamic(() => import("components/widgets/calendar/calendar")),
 };
 
-export default function Widget({ widget, style }) {
+export default function Widget({ widget }) {
   const InfoWidget = widgetMappings[widget.type];
 
   if (InfoWidget) {
     return (
       <ErrorBoundary>
-        <InfoWidget options={{ ...widget.options, style }} />
+        <InfoWidget options={widget.options} />
       </ErrorBoundary>
     );
   }
