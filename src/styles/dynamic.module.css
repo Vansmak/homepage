@@ -1,0 +1,35 @@
+
+.hidden-section {
+  display: none;
+}
+.hidden-version {
+  display: none;
+}
+.dynamicBg {
+  animation: gradient 20s ease infinite;
+  background-size: 100% 100%;
+}
+
+@keyframes gradient {
+  0% {
+    background-color: #4b4e6d;
+  }
+  25% {
+    background-color: #283c86;
+  }
+  50% {
+    background-color: #1e3d58;
+  }
+  75% {
+    background-color: #283c86;
+  }
+  100% {
+    background-color: #4b4e6d;
+  }
+}
+
+
+
+
+
+
