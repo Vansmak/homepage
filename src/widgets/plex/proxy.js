@@ -2,15 +2,14 @@
 import cache from "memory-cache";
 import { xml2json } from "xml-js";
 
+import widgets from "widgets/widgets";
 import { formatApiCall } from "utils/proxy/api-helpers";
 import { httpProxy } from "utils/proxy/http";
 import getServiceWidget from "utils/config/service-helpers";
 import createLogger from "utils/logger";
-import widgets from "widgets/widgets";
 
 const proxyName = "plexProxyHandler";
 const librariesCacheKey = `${proxyName}__libraries`;
-const albumsCacheKey = `${proxyName}__albums`;
 const moviesCacheKey = `${proxyName}__movies`;
 const tvCacheKey = `${proxyName}__tv`;
 const logger = createLogger(proxyName);
@@ -88,41 +87,32 @@ export default async function plexProxyHandler(req, res) {
     }
   }
 
-  let albums = cache.get(`${albumsCacheKey}.${service}`);
   let movies = cache.get(`${moviesCacheKey}.${service}`);
   let tv = cache.get(`${tvCacheKey}.${service}`);
-  if (albums === null || movies === null || tv === null) {
-    albums = 0;
+  if (movies === null || tv === null) {
     movies = 0;
     tv = 0;
-    logger.debug("Getting counts from Plex API");
-    const movieTVLibraries = libraries.filter(l => ["movie", "show", "artist"].includes(l._attributes.type));
+    logger.debug("Getting movie + tv counts from Plex API");
+    const movieTVLibraries = libraries.filter(l => ["movie", "show"].includes(l._attributes.type));
     await Promise.all(movieTVLibraries.map(async (library) => {
-      const libraryURL = ["movie", "show"].includes(library._attributes.type) ? 
-        `/library/sections/${library._attributes.key}/all` : // tv + movies
-        `/library/sections/${library._attributes.key}/albums`; // music
-      [status, apiData] = await fetchFromPlexAPI(libraryURL, widget);
+      [status, apiData] = await fetchFromPlexAPI(`/library/sections/${library._attributes.key}/all`, widget);
       if (apiData && apiData.MediaContainer) {
         const size = parseInt(apiData.MediaContainer._attributes.size, 10);
         if (library._attributes.type === "movie") {
           movies += size;
         } else if (library._attributes.type === "show") {
           tv += size;
-        } else if (library._attributes.type === "artist") {
-          albums += size;
         }
       }
     }));
-    cache.put(`${albumsCacheKey}.${service}`, albums, 1000 * 60 * 10);
     cache.put(`${tvCacheKey}.${service}`, tv, 1000 * 60 * 10);
     cache.put(`${moviesCacheKey}.${service}`, movies, 1000 * 60 * 10);
   }
   
   const data = {
     streams,
-    albums,
-    movies,
     tv,
+    movies
   };
 
   return res.status(status).send(data);

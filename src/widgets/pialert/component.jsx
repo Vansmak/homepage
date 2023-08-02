@@ -18,20 +18,20 @@ export default function Component({ service }) {
   if (!pialertData) {
     return (
       <Container service={service}>
-        <Block label="pialert.total" />
-        <Block label="pialert.connected" />
-        <Block label="pialert.new_devices" />
-        <Block label="pialert.down_alerts" />
+        <Block label="total" />
+        <Block label="connected" />
+        <Block label="new_devices" />
+        <Block label="down_alerts" />
       </Container>
     );
   }
 
   return (
     <Container service={service}>
-      <Block label="pialert.total" value={t("common.number", { value: parseInt(pialertData[0], 10) })} />
-      <Block label="pialert.connected" value={t("common.number", { value: parseInt(pialertData[1], 10) })} />
-      <Block label="pialert.new_devices" value={t("common.number", { value: parseInt(pialertData[3], 10) })} />
-      <Block label="pialert.down_alerts" value={t("common.number", { value: parseInt(pialertData[4], 10) })} />
+      <Block label="total" value={t("common.number", { value: parseInt(pialertData[0], 10) })} />
+      <Block label="connected" value={t("common.number", { value: parseInt(pialertData[1], 10) })} />
+      <Block label="new_devices" value={t("common.number", { value: parseInt(pialertData[3], 10) })} />
+      
     </Container>
   );
 }

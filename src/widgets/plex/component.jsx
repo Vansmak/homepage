@@ -14,14 +14,13 @@ export default function Component({ service }) {
   });
 
   if (plexAPIError) {
-    return <Container service={service} error={plexAPIError} />;
+    return <Container error={plexAPIError} />;
   }
 
   if (!plexData) {
     return (
       <Container service={service}>
         <Block label="plex.streams" />
-        <Block label="plex.albums" />
         <Block label="plex.movies" />
         <Block label="plex.tv" />
       </Container>
@@ -30,10 +29,10 @@ export default function Component({ service }) {
 
   return (
     <Container service={service}>
-      <Block label="plex.streams" value={t("common.number", { value: plexData.streams })} />
-      <Block label="plex.albums" value={t("common.number", { value: plexData.albums })} />
-      <Block label="plex.movies" value={t("common.number", { value: plexData.movies })} />
-      <Block label="plex.tv" value={t("common.number", { value: plexData.tv })} />
+      <Block label="Streaming" value={t("common.number", { value: plexData.streams })} />
+      <Block label="Movies" value={t("common.number", { value: plexData.movies })} />
+      <Block label="Series" value={t("common.number", { value: plexData.tv })} />
     </Container>
   );
+  
 }

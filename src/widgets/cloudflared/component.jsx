@@ -1,6 +1,9 @@
+import styles from "./styles.module.css";
+
 import Container from "components/services/widget/container";
 import Block from "components/services/widget/block";
 import useWidgetAPI from "utils/proxy/use-widget-api";
+
 
 export default function Component({ service }) {
   const { widget } = service;
@@ -8,7 +11,7 @@ export default function Component({ service }) {
   const { data: statsData, error: statsError } = useWidgetAPI(widget, "cfd_tunnel");
 
   if (statsError) {
-    return <Container service={service} error={statsError} />;
+    return <Container error={statsError} />;
   }
 
   if (!statsData) {
@@ -24,8 +27,11 @@ export default function Component({ service }) {
 
   return (
     <Container service={service}>
+      <Block
+        label="cloudflared.origin_ip"
+        value={<span className={styles.ip} title={originIP}>IP address</span>}
+      />
       <Block label="cloudflared.status" value={statsData.result.status.charAt(0).toUpperCase() + statsData.result.status.slice(1)} />
-      <Block label="cloudflared.origin_ip" value={originIP} />
     </Container>
   );
 }

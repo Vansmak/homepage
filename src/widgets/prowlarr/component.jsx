@@ -1,17 +1,15 @@
-import { useTranslation } from "react-i18next";
-
 import Container from "components/services/widget/container";
 import Block from "components/services/widget/block";
 import useWidgetAPI from "utils/proxy/use-widget-api";
 
 export default function Component({ service }) {
-  const { t } = useTranslation();
+  
   const { widget } = service;
 
   const { data: grabsData, error: grabsError } = useWidgetAPI(widget, "indexerstats");
 
   if (grabsError) {
-    return <Container service={service} error={grabsError} />;
+    return <Container error={grabsError} />;
   }
 
   if (!grabsData) {
@@ -32,16 +30,15 @@ export default function Component({ service }) {
   grabsData?.indexers?.forEach((element) => {
     numberOfGrabs += element.numberOfGrabs;
     numberOfQueries += element.numberOfQueries;
-    numberOfFailedGrabs += element.numberOfFailedGrabs;
-    numberOfFailedQueries += element.numberOfFailedQueries;
+    numberOfFailedGrabs += numberOfFailedGrabs + element.numberOfFailedGrabs;
+    numberOfFailedQueries += numberOfFailedQueries + element.numberOfFailedQueries;
   });
 
   return (
     <Container service={service}>
-      <Block label="prowlarr.numberOfGrabs" value={t("common.number", { value: numberOfGrabs })} />
-      <Block label="prowlarr.numberOfQueries" value={t("common.number", { value: numberOfQueries })} />
-      <Block label="prowlarr.numberOfFailGrabs" value={t("common.number", { value: numberOfFailedGrabs })} />
-      <Block label="prowlarr.numberOfFailQueries" value={t("common.number", { value: numberOfFailedQueries })} />
+      <Block label="grabs/failed" value={`${numberOfGrabs} / ${numberOfFailedGrabs}`} />
+      <Block label="queries/failed" value={`${numberOfQueries} / ${numberOfFailedQueries}`} />
     </Container>
   );
+  
 }

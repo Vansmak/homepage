@@ -1,0 +1,25 @@
+.ip {
+    position: relative;
+    cursor: help;
+  }
+  
+  .ip::after {
+    content: attr(title);
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    padding: 0.5rem;
+    background-color: black;
+    color: white;
+    font-size: 0.75rem;
+    border-radius: 0.25rem;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+  }
+  
+  .ip:hover::after {
+    opacity: 1;
+  }
+  

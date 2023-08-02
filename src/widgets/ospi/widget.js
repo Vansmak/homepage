@@ -1,24 +1,18 @@
 import genericProxyHandler from "utils/proxy/handlers/generic";
 
 const widget = {
-  api: "{url}/api/3/{endpoint}",
+  api: "{url}/{endpoint}",
   proxyHandler: genericProxyHandler,
 
   mappings: {
-    mem: {
-      endpoint: "mem",
+    system: {
+      endpoint: "jn",
     },
-    temp: {
-      endpoint: "sensors",
+    programs: {
+      endpoint: "jp?pid=-1",
     },
   },
 };
 
 export default widget;
-
-
-
-
-
-
 

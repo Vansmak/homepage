@@ -1,44 +1,55 @@
-import Memory from "./metrics/memory";
-import Cpu from "./metrics/cpu";
-import Sensor from "./metrics/sensor";
-import Net from "./metrics/net";
-import Process from "./metrics/process";
-import Disk from "./metrics/disk";
-import GPU from "./metrics/gpu";
-import Info from "./metrics/info";
+import { useTranslation } from "next-i18next";
 
-export default function Component({ service }) {
+import Container from "components/services/widget/container";
+import Block from "components/services/widget/block";
+import useWidgetAPI from "utils/proxy/use-widget-api";
+
+function convertToFahrenheit(t) {
+  return t * 9/5 + 32;
+}
+
+export default function GlancesStats({ service }) {
+  const { t } = useTranslation();
+
   const { widget } = service;
 
-  if (widget.metric === "info") {
-    return <Info service={service} />;
+  const { data: memData, error: memError } = useWidgetAPI(widget, "mem");
+  const { data: tempData, error: tempError } = useWidgetAPI(widget, "temp");
+
+  if (memError || tempError) {
+    return (
+      <Container service={service}>
+        <Block label="Memory" value="Unavailable" />
+        <Block label="Temp" value="Unavailable" />
+      </Container>
+    );
   }
 
-  if (widget.metric === "memory") {
-    return <Memory service={service} />;
+  if (!memData || !tempData) {
+    return (
+      <Container service={service}>
+        <Block label="Memory" value="Unavailable" />
+        <Block label="Temp" value="Unavailable" />
+      </Container>
+    );
   }
 
-  if (widget.metric === "process") {
-    return <Process service={service} />;
-  }
+  const unit = "celsius";
+  const memPercent = Math.round((memData.used / memData.total) * 100);
+  const tempValue = tempData[0].value;
 
-  if (widget.metric.match(/^network:/)) {
-    return <Net service={service} />;
-  }
-
-  if (widget.metric.match(/^sensor:/)) {
-    return <Sensor service={service} />;
-  }
-
-  if (widget.metric.match(/^disk:/)) {
-    return <Disk service={service} />;
-  }
-
-  if (widget.metric.match(/^gpu:/)) {
-    return <GPU service={service} />;
-  }
-
-  if (widget.metric === "cpu") {
-    return <Cpu service={service} />;
-  }
+  return (
+    <Container service={service}>
+      <Block label="Memory" value={`${memPercent}%`} />
+      <Block
+        label="Temp"
+        value={`${t("common.number", {
+          value: unit === "celsius" ? tempValue : convertToFahrenheit(tempValue),
+          style: "unit",
+          unit,
+          maximumFractionDigits: 1,
+        })}`}
+      />
+    </Container>
+  );
 }

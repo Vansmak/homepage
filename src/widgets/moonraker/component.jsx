@@ -45,7 +45,10 @@ export default function Component({ service }) {
     <Container service={service}>
       <Block label="moonraker.layers" value={`${currentLayer} / ${totalLayer}`} />
       <Block label="moonraker.print_progress" value={t("common.percent", { value: (displayStatus.result.status.display_status.progress * 100) })} />
-      <Block label="moonraker.print_status" value={printStats.result.status.print_stats.state} />
+      {/* Change "moonraker.print_status" label to "status" */}
+      <Block label="status" value={printStats.result.status.print_stats.state} labelValue="Status" />
     </Container>
   );
+  
+  
 }
