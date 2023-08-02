@@ -1,17 +1,19 @@
 /* eslint-disable react/no-array-index-key */
 import useSWR, { SWRConfig } from "swr";
 import Head from "next/head";
-import dynamic from "next/dynamic";
+/* import dynamic from "next/dynamic"; */
 import classNames from "classnames";
 import { useTranslation } from "next-i18next";
 import { useEffect, useContext, useState } from "react";
 import { BiError } from "react-icons/bi";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 
+import styles from "../../config/dynamic.module.css";
+
 import ServicesGroup from "components/services/group";
 import BookmarksGroup from "components/bookmarks/group";
 import Widget from "components/widgets/widget";
-import Revalidate from "components/toggles/revalidate";
+/* import Revalidate from "components/toggles/revalidate"; */
 import createLogger from "utils/logger";
 import useWindowFocus from "utils/hooks/window-focus";
 import { getSettings } from "utils/config/config";
@@ -21,10 +23,9 @@ import { SettingsContext } from "utils/contexts/settings";
 import { bookmarksResponse, servicesResponse, widgetsResponse } from "utils/config/api-response";
 import ErrorBoundary from "components/errorboundry";
 import themes from "utils/styles/themes";
-import QuickLaunch from "components/quicklaunch";
-import { getStoredProvider, searchProviders } from "components/widgets/search/search";
 
-const ThemeToggle = dynamic(() => import("components/toggles/theme"), {
+
+/* const ThemeToggle = dynamic(() => import("components/toggles/theme"), {
   ssr: false,
 });
 
@@ -35,8 +36,9 @@ const ColorToggle = dynamic(() => import("components/toggles/color"), {
 const Version = dynamic(() => import("components/version"), {
   ssr: false,
 });
+*/
+const rightAlignedWidgets = ["weatherapi", "myopenweather", "openmeteo", "search", "datetime"];
 
-const rightAlignedWidgets = ["weatherapi", "openweathermap", "weather", "openmeteo", "search", "datetime"];
 
 export async function getStaticProps() {
   let logger;
@@ -160,7 +162,6 @@ const headerStyles = {
     "m-4 mb-0 sm:m-8 sm:mb-0 rounded-md shadow-md shadow-theme-900/10 dark:shadow-theme-900/20 bg-theme-100/20 dark:bg-white/5 p-3",
   underlined: "m-4 mb-0 sm:m-8 sm:mb-1 border-b-2 pb-4 border-theme-800 dark:border-theme-200/50",
   clean: "m-4 mb-0 sm:m-8 sm:mb-0",
-  boxedWidgets: "m-4 mb-0 sm:m-8 sm:mb-0 sm:mt-1",
 };
 
 function Home({ initialSettings }) {
@@ -177,7 +178,7 @@ function Home({ initialSettings }) {
   const { data: bookmarks } = useSWR("/api/bookmarks");
   const { data: widgets } = useSWR("/api/widgets");
 
-  const servicesAndBookmarks = [...services.map(sg => sg.services).flat(), ...bookmarks.map(bg => bg.bookmarks).flat()]
+  
 
   useEffect(() => {
     if (settings.language) {
@@ -193,42 +194,8 @@ function Home({ initialSettings }) {
     }
   }, [i18n, settings, color, setColor, theme, setTheme]);
 
-  const [searching, setSearching] = useState(false);
-  const [searchString, setSearchString] = useState("");
-  let searchProvider = null;
-  const searchWidget = Object.values(widgets).find(w => w.type === "search");
-  if (searchWidget) {
-    if (Array.isArray(searchWidget.options?.provider)) {
-      // if search provider is a list, try to retrieve from localstorage, fall back to the first
-      searchProvider = getStoredProvider() ?? searchProviders[searchWidget.options.provider[0]];
-    } else if (searchWidget.options?.provider === 'custom') {
-      searchProvider = {
-        url: searchWidget.options.url
-      }
-    } else {
-      searchProvider = searchProviders[searchWidget.options?.provider];
-    }
-  }
-  const headerStyle = initialSettings?.headerStyle || "underlined";
-
-  useEffect(() => {
-    function handleKeyDown(e) {
-      if (e.target.tagName === "BODY") {
-        if (String.fromCharCode(e.keyCode).match(/(\w|\s)/g) && !(e.altKey || e.ctrlKey || e.metaKey || e.shiftKey)) {
-          setSearching(true);
-        } else if (e.key === "Escape") {
-          setSearchString("");
-          setSearching(false);
-        }
-      }
-    }
-
-    document.addEventListener('keydown', handleKeyDown);
-
-    return function cleanup() {
-      document.removeEventListener('keydown', handleKeyDown);
-    }
-  })
+  const componentWidgets = ["player",  /* Add other component widget names here */];
+  const isMobileScreen = typeof window !== "undefined" && window.innerWidth <= 768;
 
   return (
     <>
@@ -254,89 +221,86 @@ function Home({ initialSettings }) {
         />
         <meta name="theme-color" content={themes[initialSettings.color || "slate"][initialSettings.theme || "dark"]} />
       </Head>
-      <div className="relative container m-auto flex flex-col justify-start z-10 h-full">
-        <div
-          className={classNames(
-            "flex flex-row flex-wrap  justify-between",
-            headerStyles[headerStyle]
-          )}
-        >
-          <QuickLaunch
-            servicesAndBookmarks={servicesAndBookmarks}
-            searchString={searchString}
-            setSearchString={setSearchString}
-            isOpen={searching}
-            close={setSearching}
-            searchProvider={settings.quicklaunch?.hideInternetSearch ? null : searchProvider}
-          />
-          {widgets && (
-            <>
-              {widgets
-                .filter((widget) => !rightAlignedWidgets.includes(widget.type))
-                .map((widget, i) => (
-                  <Widget key={i} widget={widget} style={{ header: headerStyle, isRightAligned: false}} />
-                ))}
+      <div className="relative container m-auto flex flex-col justify-between z-10 h-full">
+      <div
+        className={classNames(
+          "flex flex-row flex-wrap  justify-between",
+          headerStyles[initialSettings.headerStyle || "underlined"]
+        )}
+      >
+        {widgets && (
+          <>
+            {!isMobileScreen && widgets
+              .filter((widget) => !rightAlignedWidgets.includes(widget.type))
+              .map((widget, i) => (
+                <Widget key={i} widget={widget} />
+              ))}
 
-              <div className={classNames(
-                "m-auto flex flex-wrap grow sm:basis-auto justify-between md:justify-end",
-                headerStyle === "boxedWidgets" ? "sm:ml-4" : "sm:ml-2"
-              )}>
+            {!isMobileScreen && (
+              <div className="m-auto sm:ml-2 flex flex-wrap grow sm:basis-auto justify-between md:justify-end">
                 {widgets
                   .filter((widget) => rightAlignedWidgets.includes(widget.type))
                   .map((widget, i) => (
-                    <Widget key={i} widget={widget} style={{ header: headerStyle, isRightAligned: true}} />
+                    <Widget key={i} widget={widget} />
                   ))}
               </div>
-            </>
-          )}
-        </div>
-
-        {services?.length > 0 && (
-          <div className="flex flex-wrap p-4 sm:p-8 sm:pt-4 items-start pb-2">
-            {services.map((group) => (
-              <ServicesGroup 
-                key={group.name}
-                group={group.name}
-                services={group}
-                layout={initialSettings.layout?.[group.name]}
-                fiveColumns={settings.fiveColumns} 
-                disableCollapse={settings.disableCollapse} />
-            ))}
-          </div>
+            )}
+          </>
         )}
-
-        {bookmarks?.length > 0 && (
-          <div className={`grow flex flex-wrap pt-0 p-4 sm:p-8 gap-2 grid-cols-1 lg:grid-cols-2 lg:grid-cols-${Math.min(6, bookmarks.length)}`}>
-            {bookmarks.map((group) => (
-              <BookmarksGroup
-                key={group.name}
-                group={group}
-                disableCollapse={settings.disableCollapse} />
-            ))}
-          </div>
-        )}
-
-        <div className="flex flex-col mt-auto p-8 w-full">
-          <div className="flex w-full justify-end">
-            {!initialSettings?.color && <ColorToggle />}
-            <Revalidate />
-            {!initialSettings?.theme && <ThemeToggle />}
-          </div>
-
-          <div className="flex mt-4 w-full justify-end">
-            {!initialSettings?.hideVersion && <Version />}
-          </div>
-        </div>
       </div>
-    </>
-  );
+      
+      {!isMobileScreen && (
+  <div className="container mx-auto flex flex-wrap">
+    {bookmarks?.length > 0 && (
+      <div className={`grow flex flex-wrap pt-0 p-4 sm:p-8 gap-2 grid-cols-1 lg:grid-cols-2 lg:grid-cols-${Math.min(6, bookmarks.length)}`}>
+        {bookmarks.map((group) => (
+          <BookmarksGroup key={group.name} group={group} />
+        ))}
+      </div>
+    )}
+
+    {/* Component widgets section */}
+    <div className="flex flex-wrap p-4 sm:p-8 sm:pt-4 items-start pb-0">
+      {componentWidgets.map((widgetName) => (
+        <Widget key={widgetName} widget={{ type: widgetName }} />
+      ))}
+    </div>
+  </div>
+)}
+
+{/* Services section */}
+{services?.length > 0 && (
+  <div className={classNames("flex flex-wrap p-4 sm:p-8 sm:pt-4 items-start pb-0", headerStyles.underlined)}>
+    {services.map((group) => (
+      <ServicesGroup
+        key={group.name}
+        services={group}
+        layout={initialSettings.layout?.[group.name]}
+        fiveColumns={settings.fiveColumns}
+      />
+    ))}
+  </div>
+)}
+
+{isMobileScreen && widgets && widgets
+  .filter((widget) => rightAlignedWidgets.includes(widget.type))
+  .map((widget, i) => (
+    <Widget key={i} widget={widget} />
+  ))
 }
+      
+    </div>
+  </>
+);
+          }
 
 export default function Wrapper({ initialSettings, fallback }) {
   const wrappedStyle = {};
   let backgroundBlur = false;
   let backgroundSaturate = false;
   let backgroundBrightness = false;
+  let hasBackgroundImage = false;
+
   if (initialSettings && initialSettings.background) {
     let opacity = initialSettings.backgroundOpacity ?? 1;
     let backgroundImage = initialSettings.background;
@@ -347,42 +311,49 @@ export default function Wrapper({ initialSettings, fallback }) {
       backgroundBrightness = initialSettings.background.brightness !== undefined;
       if (initialSettings.background.opacity !== undefined) opacity = initialSettings.background.opacity / 100;
     }
-    const opacityValue = 1 - opacity;
-    wrappedStyle.backgroundImage = `
-      linear-gradient(
-        rgb(var(--bg-color) / ${opacityValue}),
-        rgb(var(--bg-color) / ${opacityValue})
-      ),
-      url(${backgroundImage})`;
-    wrappedStyle.backgroundPosition = "center";
-    wrappedStyle.backgroundSize = "cover";
+    if (backgroundImage) {
+      hasBackgroundImage = true;
+      const opacityValue = 1 - opacity;
+      wrappedStyle.backgroundImage = `
+        linear-gradient(
+          rgb(var(--bg-color) / ${opacityValue}),
+          rgb(var(--bg-color) / ${opacityValue})
+        ),
+        url(${backgroundImage})`;
+      wrappedStyle.backgroundPosition = "center";
+      wrappedStyle.backgroundSize = "cover";
+      wrappedStyle.backgroundAttachment = "fixed";
+    }
   }
 
   return (
     <div
-      id="page_wrapper"
-      className={classNames(
-        "relative",
-        initialSettings.theme && initialSettings.theme,
-        initialSettings.color && `theme-${initialSettings.color}`
-      )}
+    id="page_wrapper"
+    className={classNames(
+      "relative",
+      initialSettings.theme && initialSettings.theme,
+      initialSettings.color && `theme-${initialSettings.color}`,
+      hasBackgroundImage && styles.backgroundImage
+    )}
+  >
+  
+    <div
+      id="page_container"
+      className="fixed overflow-auto w-full h-full bg-theme-50 dark:bg-theme-800 transition-all"
+      style={wrappedStyle}
     >
       <div
-        id="page_container"
-        className="fixed overflow-auto w-full h-full bg-theme-50 dark:bg-theme-800 transition-all"
-        style={wrappedStyle}
-      >
-        <div
-        id="inner_wrapper"
-        className={classNames(
-          'fixed overflow-auto w-full h-full',
-          backgroundBlur && `backdrop-blur${initialSettings.background.blur.length ? '-' : ""}${initialSettings.background.blur}`,
-          backgroundSaturate && `backdrop-saturate-${initialSettings.background.saturate}`,
-          backgroundBrightness && `backdrop-brightness-${initialSettings.background.brightness}`,
-        )}>
-          <Index initialSettings={initialSettings} fallback={fallback} />
-        </div>
+      id="inner_wrapper" 
+      className={classNames(
+        !hasBackgroundImage ? styles.dynamicBg : styles.backgroundImage,
+        backgroundBlur && `backdrop-blur${initialSettings.background.blur.length ? '-' : ""}${initialSettings.background.blur}`,
+        backgroundSaturate && `backdrop-saturate-${initialSettings.background.saturate}`,
+        backgroundBrightness && `backdrop-brightness-${initialSettings.background.brightness}`,
+      )}>
+        <Index initialSettings={initialSettings} fallback={fallback} />
       </div>
     </div>
-  );
+  </div>
+);
+
 }
