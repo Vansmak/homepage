@@ -1,0 +1,123 @@
+
+  
+.resourcesContainer {
+  margin-left: 0px;
+  margin-right: 0px;
+  
+}
+
+.resourcesContainer2 {
+  
+  margin-right: 100px;
+}
+.dateContainer {
+    margin: auto;
+    display: flex;
+    
+    font-size: 1em;
+  }
+  
+.quote { 
+    margin: auto;
+    max-width: 600px; /* Or adjust to a suitable value */
+    white-space: pre-wrap;
+    text-align: center;
+    color: grey;
+    font-size: .9em;
+  }
+  .author { 
+    margin: auto;
+    max-width: 600px; /* Or adjust to a suitable value */
+    white-space: pre-wrap;
+    text-align: center;
+    color: white;
+    font-size: .8em;
+  }
+  
+
+  .truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px; /* or any other value that suits your design */
+    color: white;
+    font-size: .8em;
+  }
+  
+
+/* calendarBox */
+.calendarBox {
+  display: flex;
+  background-color: rgba(255, 255, 255, 0.2); /* adjust the color and transparency to match your design */
+  color: #000;
+  border-radius: 5px;
+  overflow: hidden;
+  align-items: stretch; /* make the children stretch to fill the height */
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  margin-bottom: 10px;
+  margin-right: 0px
+}
+
+.date {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.4); /* adjust the color and transparency to match your design */
+  padding: 10px;
+}
+
+.month {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
+.day {
+  font-size: 1.2rem;
+}
+
+.event {
+  margin: 0 2px;
+  color: white; /* or whichever color you want for the event information */
+  font-size: .8em;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  
+  flex-grow: 1; /* make the event part fill the remaining space */
+}
+
+
+.calendarBox .event {
+  flex-grow: 1;
+}
+
+.weatherBox {
+  display: flex;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #000;
+  border-radius: 5px;
+  overflow: hidden;
+  align-items: stretch;
+  margin-left: 100px;
+}
+
+.weatherIcon {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.2);
+  
+  color: black
+}
+
+.weatherContent {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  
+  flex-grow: 1;
+}
+
+
